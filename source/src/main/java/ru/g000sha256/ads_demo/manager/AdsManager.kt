@@ -1,0 +1,76 @@
+package ru.g000sha256.ads_demo.manager
+
+import android.content.Context
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdLoader
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.formats.UnifiedNativeAd
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.core.SingleEmitter
+import ru.g000sha256.schedulers.SchedulersHolder
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
+
+class AdsManager(private val useMock: Boolean, private val context: Context, private val schedulersHolder: SchedulersHolder) {
+
+    private val count = AtomicInteger(0)
+
+    fun load(): Single<AdItem> {
+        return Single
+                .create<AdItem> { if (useMock) loadFromMock(it) else loadFromGoogle(it) }
+                .subscribeOn(schedulersHolder.ioScheduler)
+                .retryWhen { it.delay(2L, TimeUnit.SECONDS, schedulersHolder.computationScheduler) }
+    }
+
+    private fun createAdItem(): AdItem {
+        val count = count.incrementAndGet()
+        val thread = Thread.currentThread()
+        return AdItem("Ad $count (${thread.name})")
+    }
+
+    private fun destroyUnifiedNativeAd(unifiedNativeAd: UnifiedNativeAd) {
+        Completable
+                .fromAction { unifiedNativeAd.destroy() }
+                .subscribeOn(schedulersHolder.ioScheduler)
+                .subscribe()
+    }
+
+    private fun loadFromMock(singleEmitter: SingleEmitter<AdItem>) {
+        try {
+            Thread.sleep(1000L)
+        } catch (interruptedException: InterruptedException) {
+            return
+        }
+        if (singleEmitter.isDisposed) return
+        val adItem = createAdItem()
+        singleEmitter.onSuccess(adItem)
+    }
+
+    private fun loadFromGoogle(singleEmitter: SingleEmitter<AdItem>) {
+        MobileAds.initialize(context)
+        val adListener = object : AdListener() {
+
+            override fun onAdFailedToLoad(errorCode: Int) {
+                if (singleEmitter.isDisposed) return
+                val throwable = Throwable()
+                singleEmitter.onError(throwable)
+            }
+
+        }
+        val adRequest = AdRequest.Builder()
+                .build()
+        AdLoader.Builder(context, "ca-app-pub-3940256099942544/2247696110")
+                .forUnifiedNativeAd {
+                    destroyUnifiedNativeAd(it)
+                    if (singleEmitter.isDisposed) return@forUnifiedNativeAd
+                    val adItem = createAdItem()
+                    singleEmitter.onSuccess(adItem)
+                }
+                .withAdListener(adListener)
+                .build()
+                .loadAd(adRequest)
+    }
+
+}

@@ -1,0 +1,29 @@
+apply plugin: "com.android.application"
+apply plugin: "kotlin-android"
+android {
+    buildToolsVersion "29.0.3"
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    compileSdkVersion 29
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 29
+    }
+}
+dependencies {
+    implementation libraryAds
+    implementation libraryKotlin
+    implementation libraryRecyclerView
+    implementation libraryRxJava
+    implementation librarySchedulers.android
+    implementation librarySchedulers.core
+}
+repositories {
+    google()
+    jcenter()
+    maven {
+        url "https://jitpack.io"
+    }
+}

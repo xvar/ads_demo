@@ -1,0 +1,11 @@
+buildscript {
+    apply from: "dependencies.gradle"
+    dependencies {
+        classpath pluginAndroid
+        classpath pluginKotlin
+    }
+    repositories {
+        google()
+        jcenter()
+    }
+}

@@ -1,0 +1,9 @@
+<resources>
+    <style name="Theme.App" parent="android:Theme.Material.NoActionBar">
+        <item name="android:colorAccent">@color/lime</item>
+        <item name="android:colorEdgeEffect">@color/lime</item>
+        <item name="android:navigationBarColor">@color/gray</item>
+        <item name="android:statusBarColor">@color/gray</item>
+        <item name="android:windowBackground">@color/gray</item>
+    </style>
+</resources>

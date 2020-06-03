@@ -1,0 +1,24 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="ru.g000sha256.ads_demo"
+    tools:ignore="ManifestOrder,MissingApplicationIcon">
+    <application
+        android:name="ru.g000sha256.ads_demo.MainApplication"
+        android:allowBackup="false"
+        android:label="Ads Demo"
+        android:theme="@style/Theme.App">
+        <activity
+            android:name="ru.g000sha256.ads_demo.MainActivity"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-6777706645301927~3513571193" />
+    </application>
+    <uses-permission android:name="android.permission.INTERNET" />
+</manifest>
